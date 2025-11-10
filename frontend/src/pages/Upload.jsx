@@ -125,49 +125,46 @@ function Upload() {
       </div>
 
       <div className="card">
-        <h2 className="card-title">🧪 Archivos Maliciosos para Probar</h2>
+        <h2 className="card-title">🧪 Tipos de Ataques de File Upload</h2>
         
-        <h3>1. Archivo PHP para Web Shell</h3>
+        <h3>1. Web Shell (Archivo .php)</h3>
         <div className="code-block">
-          <pre>{`Crea un archivo llamado: shell.php
-Contenido:
-<?php system($_GET['cmd']); ?>
-
-Luego accede:
-http://localhost:3000/uploads/shell.php?cmd=ls`}</pre>
+          <pre>{`Nombre: shell.php
+Descripción: Permite ejecutar comandos del sistema
+Riesgo: CRÍTICO - Ejecución remota de código (RCE)
+Mitigación: Validar extensiones, no permitir .php en uploads`}</pre>
         </div>
 
-        <h3>2. Archivo con Doble Extensión</h3>
+        <h3>2. Doble Extensión</h3>
         <div className="code-block">
-          <pre>{`Crea: archivo.php.jpg
-Algunos servidores mal configurados ejecutarán el PHP`}</pre>
+          <pre>{`Nombre: archivo.php.jpg
+Descripción: Engaña a validadores que solo miran la extensión final
+Riesgo: ALTO - Bypass de filtros
+Mitigación: Validar MIME type real del archivo`}</pre>
         </div>
 
-        <h3>3. Archivo SVG con XSS</h3>
+        <h3>3. XSS via SVG</h3>
         <div className="code-block">
-          <pre>{`Crea un archivo: xss.svg
-Contenido:
-<svg xmlns="http://www.w3.org/2000/svg">
-  <script>alert('XSS via SVG')</script>
-</svg>`}</pre>
+          <pre>{`Nombre: xss.svg
+Descripción: Archivo SVG con scripts embebidos
+Riesgo: MEDIO - Cross-Site Scripting
+Mitigación: Sanitizar contenido XML, Content-Security-Policy`}</pre>
         </div>
 
-        <h3>4. Archivo HTML con JavaScript</h3>
+        <h3>4. HTML con JavaScript</h3>
         <div className="code-block">
-          <pre>{`Crea: malicious.html
-Contenido:
-<html><body>
-<script>alert(document.cookie)</script>
-</body></html>`}</pre>
+          <pre>{`Nombre: malicious.html
+Descripción: Página HTML que ejecuta JS al abrirse
+Riesgo: MEDIO - Phishing, robo de sesiones
+Mitigación: Servir archivos con Content-Disposition: attachment`}</pre>
         </div>
 
-        <h3>5. Path Traversal en Nombre</h3>
+        <h3>5. Path Traversal</h3>
         <div className="code-block">
-          <pre>{`Intenta subir un archivo llamado:
-../../etc/passwd.txt
-
-(Aunque multer previene esto por defecto, 
-servidores mal configurados podrían ser vulnerables)`}</pre>
+          <pre>{`Nombre: ../../etc/passwd.txt
+Descripción: Intenta sobrescribir archivos del sistema
+Riesgo: CRÍTICO - Sobrescritura de archivos
+Mitigación: Sanitizar nombres, usar nombres aleatorios`}</pre>
         </div>
       </div>
 
