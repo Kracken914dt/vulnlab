@@ -15,11 +15,13 @@ const PORT = 3000;
 // ============================================
 // Permitir CUALQUIER origen puede exponer la API a ataques CSRF y acceso no autorizado
 // MITIGACIÓN: Usar una whitelist de orígenes permitidos:
-// app.use(cors({ origin: 'http://localhost:5173', credentials: true }))
+// Para este laboratorio, permitimos el origen del frontend para que funcione con credentials
 app.use(cors({
-  origin: '*', // ¡PELIGRO! Permite cualquier origen
+  origin: 'http://localhost:5173', // Origen específico para permitir credentials
   credentials: true
 }));
+// NOTA: En un entorno real vulnerable, se usaría origin: '*', pero eso no funciona 
+// con credentials: true. Para fines educativos, usamos el origen específico.
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
