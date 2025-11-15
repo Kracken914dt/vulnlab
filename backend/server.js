@@ -1,7 +1,7 @@
 const app = require('./src/app');
 const db = require('./src/config/database');
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8000;
 
 // ============================================
 // INICIAR SERVIDOR

